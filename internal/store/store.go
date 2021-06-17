@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/jaimem88/zearch/internal/model"
 )
@@ -36,24 +37,41 @@ func New(userData []*model.User, ticketData []*model.Ticket, orgData []*model.Or
 	usersOrgs := map[model.UserID]model.OrgID{}
 	ticketsOrgs := map[model.TicketID]model.OrgID{}
 
-	for _, org := range orgData {
-		// assumes there are no duplicate IDs, otherwise data would be overridden
-		orgs[org.ID] = org
-	}
+	wg := sync.WaitGroup{}
+	wg.Add(3)
 
-	for _, user := range userData {
-		// assumes there are no duplicate IDs, otherwise data would be overridden
-		users[user.ID] = user
-		orgsUsers[user.OrganizationID] = append(orgsUsers[user.OrganizationID], user.ID)
-		usersOrgs[user.ID] = user.OrganizationID
-	}
+	go func() {
+		defer wg.Done()
 
-	for _, ticket := range ticketData {
-		// assumes there are no duplicate IDs, otherwise data would be overridden
-		tickets[ticket.ID] = ticket
-		orgsTickets[ticket.OrganizationID] = append(orgsTickets[ticket.OrganizationID], ticket.ID)
-		ticketsOrgs[ticket.ID] = ticket.OrganizationID
-	}
+		for _, org := range orgData {
+			// assumes there are no duplicate IDs, otherwise data would be overridden
+			orgs[org.ID] = org
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		for _, user := range userData {
+			// assumes there are no duplicate IDs, otherwise data would be overridden
+			users[user.ID] = user
+			orgsUsers[user.OrganizationID] = append(orgsUsers[user.OrganizationID], user.ID)
+			usersOrgs[user.ID] = user.OrganizationID
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		for _, ticket := range ticketData {
+			// assumes there are no duplicate IDs, otherwise data would be overridden
+			tickets[ticket.ID] = ticket
+			orgsTickets[ticket.OrganizationID] = append(orgsTickets[ticket.OrganizationID], ticket.ID)
+			ticketsOrgs[ticket.ID] = ticket.OrganizationID
+		}
+	}()
+
+	wg.Wait()
 
 	return &Storage{
 		UsersMap:         users,
