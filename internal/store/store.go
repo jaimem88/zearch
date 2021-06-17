@@ -1,10 +1,14 @@
 package store
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/jaimem88/zearch/internal/model"
 )
+
+var ErrNotFound = errors.New("not found")
 
 type Storage struct {
 	UsersMap         map[model.UserID]*model.User
@@ -62,17 +66,81 @@ func New(userData []*model.User, ticketData []*model.Ticket, orgData []*model.Or
 	}
 }
 
-func (s *Storage) Organizations(term string, value interface{}) *model.OrganizationResult {
-	fmt.Printf("searching organizations for: %q:%q\n", term, value)
-	return &model.OrganizationResult{}
+func (s *Storage) Organizations(term, value string) ([]*model.OrganizationResult, error) {
+	fmt.Printf("Searching organizations by: %q with value: %q\n", term, value)
+
+	var results []*model.OrganizationResult
+	var err error
+
+	if term == "_id" {
+		results, err = s.searchOrgByID(value)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return results, nil
 }
 
-func (s *Storage) Tickets(term string, value interface{}) *model.TicketResult {
+func (s *Storage) Tickets(term, value string) []*model.TicketResult {
 	fmt.Printf("searching tickets for: %q:%q\n", term, value)
-	return &model.TicketResult{}
+	return []*model.TicketResult{}
 }
 
-func (s *Storage) Users(term string, value interface{}) *model.UserResult {
+func (s *Storage) Users(term, value string) []*model.UserResult {
 	fmt.Printf("searching users for: %q:%q\n", term, value)
-	return &model.UserResult{}
+	return []*model.UserResult{}
+}
+
+func (s *Storage) searchOrgByID(value string) ([]*model.OrganizationResult, error) {
+	var results []*model.OrganizationResult
+
+	id, err := strconv.Atoi(value)
+	if err != nil {
+		return nil, err
+	}
+
+	orgID := model.OrgID(id)
+
+	org, ok := s.OrganizationsMap[orgID]
+	if !ok {
+		return nil, ErrNotFound
+	}
+
+	usersForOrg := s.OrgsUsers[orgID]
+	// initializing a slice with capacity allows us to use `append` preventing it
+	// from allocating a new slice  when the capacity is reached see https://golang.org/pkg/builtin/#append
+	userNames := make([]string, 0, len(usersForOrg))
+	for _, userID := range usersForOrg {
+		user, ok := s.UsersMap[userID]
+		if !ok {
+			// skip if we can't find the userID for some reason
+			continue
+		}
+
+		userNames = append(userNames, user.Name)
+	}
+
+	ticketsForOrg := s.OrgsTickets[orgID]
+	ticketSubjects := make([]string, 0, len(ticketsForOrg))
+	// if we had generics, maybe this could have been implemented once
+	for _, ticketID := range ticketsForOrg {
+		ticket, ok := s.TicketsMap[ticketID]
+		if !ok {
+			// skip if we can't find the ticketID for some reason
+			continue
+		}
+
+		ticketSubjects = append(ticketSubjects, ticket.Subject)
+	}
+
+	orgResult := &model.OrganizationResult{
+		Organization:   org,
+		UserNames:      userNames,
+		TicketSubjects: ticketSubjects,
+	}
+
+	results = append(results, orgResult)
+
+	return results, nil
 }

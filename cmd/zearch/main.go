@@ -96,7 +96,7 @@ func main() {
 			}
 			c.Search(entity, term, value)
 		case 1:
-			c.SearchableFields()
+			c.PrintSearchableFields()
 		case 2:
 			p := promptui.Prompt{
 				Label:     "Are you sure you want to quit??",

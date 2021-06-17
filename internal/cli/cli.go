@@ -1,16 +1,18 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/jaimem88/zearch/internal/model"
+	"github.com/jaimem88/zearch/internal/store"
 )
 
 type Searcher interface {
-	Organizations(term string, value interface{}) *model.OrganizationResult
-	Tickets(term string, value interface{}) *model.TicketResult
-	Users(term string, value interface{}) *model.UserResult
+	Organizations(term, value string) ([]*model.OrganizationResult, error)
+	Tickets(term, value string) []*model.TicketResult
+	Users(term, value string) []*model.UserResult
 }
 
 type CLI struct {
@@ -23,19 +25,66 @@ func New(searcher Searcher) *CLI {
 	}
 }
 
-func (c *CLI) Search(entity, term string, value interface{}) (interface{}, error) {
+func (c *CLI) Search(entity, term, value string) error {
+	printDashes(80)
 	switch strings.ToLower(entity) {
 	case "organizations":
-		return c.searcher.Organizations(term, value), nil
+		r, err := c.searcher.Organizations(term, value)
+		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				fmt.Println("No results found")
+				return nil
+			}
+
+			return err
+		}
+
+		if len(r) == 0 {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		for i, rr := range r {
+			fmt.Printf("org_%d: %+v\n", i, rr.Organization)
+			for j, userName := range rr.UserNames {
+				fmt.Printf("user_%d %s\n", j, userName)
+			}
+			for k, ticketSubject := range rr.TicketSubjects {
+				fmt.Printf("ticket_%d %+v\n", k, ticketSubject)
+			}
+		}
+
 	case "tickets":
-		return c.searcher.Tickets(term, value), nil
+		c.searcher.Tickets(term, value)
 	case "users":
-		return c.searcher.Users(term, value), nil
+		c.searcher.Users(term, value)
 	default:
-		return nil, fmt.Errorf("unknown option: %s")
+		return nil
 	}
+
+	return nil
 }
 
-func (c *CLI) SearchableFields() (interface{}, error) {
-	return nil, nil
+func (c *CLI) PrintSearchableFields() {
+	printDashes(80)
+	printFields("Users", model.GetJSONTagsFromStruct(model.User{}))
+
+	printDashes(80)
+	printFields("Tickets", model.GetJSONTagsFromStruct(model.Ticket{}))
+
+	printDashes(80)
+	printFields("Organizations", model.GetJSONTagsFromStruct(model.Organization{}))
+}
+
+func printFields(param, fields string) {
+	fmt.Printf("Search %s by:\n%s", param, fields)
+}
+
+func printDashes(n int) {
+	fmt.Println()
+	for n > 0 {
+		n--
+		fmt.Print("-")
+	}
+	fmt.Println()
 }

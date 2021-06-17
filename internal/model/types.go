@@ -1,5 +1,10 @@
 package model
 
+import (
+	"reflect"
+	"strings"
+)
+
 // These types serve as aliases to help read the code
 type (
 	UserID   int
@@ -19,10 +24,26 @@ type Organization struct {
 	Tags          []string `json:"tags"`
 }
 
+// GetJSONTagsFromStruct users refecltion to iterate over t and extract the JSON tag for each field.
+// Assumes the JSON tag is one word, no commas or other fields like `omitempty`.
+// Does not support nested structs
+func GetJSONTagsFromStruct(t interface{}) string {
+	sb := strings.Builder{}
+
+	val := reflect.ValueOf(t)
+	for i := 0; i < val.Type().NumField(); i++ {
+
+		sb.WriteString(val.Type().Field(i).Tag.Get("json"))
+		sb.WriteRune('\n')
+	}
+
+	return sb.String()
+}
+
 type OrganizationResult struct {
 	*Organization
-	Users   []string
-	Tickets []string
+	UserNames      []string
+	TicketSubjects []string
 }
 
 type Ticket struct {
