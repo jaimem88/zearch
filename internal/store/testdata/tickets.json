@@ -1,0 +1,25 @@
+[
+  {
+    "_id": "27c447d9-cfda-4415-9a72-d5aa12942cf1",
+    "url": "http://initech.zendesk.com/api/v2/tickets/27c447d9-cfda-4415-9a72-d5aa12942cf1.json",
+    "external_id": "d3516c61-d232-4f64-a0f4-a496d550cd04",
+    "created_at": "2016-01-31T07:43:00 -11:00",
+    "type": "incident",
+    "subject": "A Problem in Guyana",
+    "description": "Ex sit ea sit exercitation tempor pariatur et do deserunt irure eiusmod. Exercitation anim consectetur amet anim id.",
+    "priority": "normal",
+    "status": "closed",
+    "submitter_id": 67,
+    "assignee_id": 74,
+    "organization_id": 101,
+    "tags": [
+      "Mississippi",
+      "Marshall Islands",
+      "South Dakota",
+      "Montana"
+    ],
+    "has_incidents": false,
+    "due_at": "2016-08-18T10:49:09 -10:00",
+    "via": "web"
+  }
+]
