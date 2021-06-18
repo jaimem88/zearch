@@ -21,3 +21,6 @@ cover:
 clean:
 	echo "Removing out/"
 	rm -rf out/*
+
+run: build
+	./out/bin/zearch ${ARGS}

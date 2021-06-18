@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/jaimem88/zearch/internal/model"
@@ -44,13 +45,10 @@ func (c *CLI) Search(entity, term, value string) error {
 			return nil
 		}
 
-		for i, rr := range r {
-			fmt.Printf("org_%d: %+v\n", i, rr.Organization)
-			for j, userName := range rr.UserNames {
-				fmt.Printf("user_%d %s\n", j, userName)
-			}
-			for k, ticketSubject := range rr.TicketSubjects {
-				fmt.Printf("ticket_%d %+v\n", k, ticketSubject)
+		for _, rr := range r {
+			err := model.OrgResultTemplate.Execute(os.Stdout, rr)
+			if err != nil {
+				return err
 			}
 		}
 

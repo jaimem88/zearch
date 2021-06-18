@@ -10,7 +10,7 @@ output:
 
 linters-settings:
   gocyclo:
-    min-complexity: 10
+    min-complexity: 15
   goimports:
     local-prefixes: github.com/jaimem88/zearch
 

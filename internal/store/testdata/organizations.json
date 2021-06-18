@@ -19,5 +19,26 @@
       "Rodriguez",
       "Farley"
     ]
+  },
+  {
+    "_id": 102,
+    "url": "http://initech.zendesk.com/api/v2/organizations/102.json",
+    "external_id": "7cd6b8d4-2999-4ff2-8cfd-44d05b449226",
+    "name": "Nutralab",
+    "domain_names": [
+      "trollery.com",
+      "datagen.com",
+      "bluegrain.com",
+      "dadabase.com"
+    ],
+    "created_at": "2016-04-07T08:21:44 -10:00",
+    "details": "Non profit",
+    "shared_tickets": true,
+    "tags": [
+      "Cherry",
+      "Collier",
+      "Fuentes",
+      "Farley"
+    ]
   }
 ]
