@@ -21,8 +21,7 @@ type OrganizationResult struct {
 
 type TicketResult struct {
 	Ticket
-	OrganizationName  string
-	TicketDescription []string
+	OrganizationName string
 }
 
 type UserResult struct {

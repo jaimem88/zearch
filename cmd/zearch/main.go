@@ -23,26 +23,10 @@ var (
 func main() {
 	flag.Parse()
 
-	////var i []map[string]interface{}
-	//var i model.Users
-	//err := parser.ReadJSONFile(*usersFilename, &i)
-	//if err != nil {
-	//	log.Fatalf("failed to load users.json: %+v", err)
-	//}
-	//for key, val := range i {
-	//	fmt.Printf("doc: %d json: %+v id %+v\n", key, val, val["_id"])
-	//	//for k, v := range val {
-	//	//	fmt.Printf("map[%s]%+v\n", k, v)
-	//	//
-	//	//}
-	//}
-	//fmt.Printf("CAN I ACCESS A FIELD: %+v\n", i[0]["_id"])
-	//
-	////fmt.Printf("What happened?: %+v\n\ntypeOf: %q", i, reflect.TypeOf(i.([]interface{})[0]))
-	//return
 	var users model.Users
 	var tickets model.Tickets
 	var orgs model.Organizations
+
 	err := reader.ReadJSONFile(*usersFilename, &users)
 	if err != nil {
 		log.Fatalf("failed to load users.json: %+v", err)

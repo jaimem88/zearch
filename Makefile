@@ -1,9 +1,12 @@
 ALL_PACKAGES=$(shell (go list ./...))
+OUT_DIR := ./out
+BIN := ${OUT_DIR}/bin/zearch
 
 .PHONY: build test cover clean run
 
 build:
-	go build -o ./out/bin/zearch ./cmd/zearch
+	rm -rf $(BIN)
+	go build -o $(BIN) ./cmd/zearch
 
 test:
 	go test $(ALL_PACKAGES) -timeout 10s
@@ -23,4 +26,4 @@ clean:
 	rm -rf out/*
 
 run: build
-	./out/bin/zearch ${ARGS}
+	$(BIN) ${ARGS}

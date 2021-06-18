@@ -13,7 +13,7 @@ import (
 type Searcher interface {
 	Organizations(term, value string) ([]model.OrganizationResult, error)
 	Tickets(term, value string) ([]model.TicketResult, error)
-	Users(term, value string) []model.UserResult
+	Users(term, value string) ([]model.UserResult, error)
 }
 
 type App struct {
@@ -51,11 +51,53 @@ func (c *App) Search(entity, term, value string) error {
 				return err
 			}
 		}
-
+		fmt.Printf("Total organizations found: %d\n", len(r))
 	case "tickets":
-		c.searcher.Tickets(term, value)
+		r, err := c.searcher.Tickets(term, value)
+		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				fmt.Println("No results found")
+				return nil
+			}
+
+			return err
+		}
+
+		if len(r) == 0 {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		for _, rr := range r {
+			err := model.TicketResultTemplate.Execute(os.Stdout, rr)
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Printf("Total tickets found: %d\n", len(r))
 	case "users":
-		c.searcher.Users(term, value)
+		r, err := c.searcher.Users(term, value)
+		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				fmt.Println("No results found")
+				return nil
+			}
+
+			return err
+		}
+
+		if len(r) == 0 {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		for _, rr := range r {
+			err := model.UserResultTemplate.Execute(os.Stdout, rr)
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Printf("Total users found: %d\n", len(r))
 	default:
 		return nil
 	}
