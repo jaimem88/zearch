@@ -8,9 +8,9 @@ import (
 
 	"github.com/manifoldco/promptui"
 
-	"github.com/jaimem88/zearch/internal/cli"
+	"github.com/jaimem88/zearch/internal/app"
 	"github.com/jaimem88/zearch/internal/model"
-	"github.com/jaimem88/zearch/internal/parser"
+	"github.com/jaimem88/zearch/internal/reader"
 	"github.com/jaimem88/zearch/internal/store"
 )
 
@@ -43,23 +43,23 @@ func main() {
 	var users model.Users
 	var tickets model.Tickets
 	var orgs model.Organizations
-	err := parser.ReadJSONFile(*usersFilename, &users)
+	err := reader.ReadJSONFile(*usersFilename, &users)
 	if err != nil {
 		log.Fatalf("failed to load users.json: %+v", err)
 	}
 
 	//fmt.Printf("CAN I ACCESS A FIELD: %+v\n", users[0]["_id"])
 	//return
-	err = parser.ReadJSONFile(*ticketsFilename, &tickets)
+	err = reader.ReadJSONFile(*ticketsFilename, &tickets)
 	if err != nil {
 		log.Fatalf("failed to load tickets.json: %+v", err)
 	}
-	err = parser.ReadJSONFile(*orgsFilename, &orgs)
+	err = reader.ReadJSONFile(*orgsFilename, &orgs)
 	if err != nil {
 		log.Fatalf("failed to load organizations.json: %+v", err)
 	}
 
-	c := cli.New(store.New(orgs, users, tickets))
+	c := app.New(store.New(orgs, users, tickets))
 	p := promptui.Prompt{
 		Label: "Hi Zendesk! Press return to continue",
 		Templates: &promptui.PromptTemplates{

@@ -1,4 +1,4 @@
-package cli
+package app
 
 import (
 	"errors"
@@ -16,17 +16,17 @@ type Searcher interface {
 	Users(term, value string) []model.UserResult
 }
 
-type CLI struct {
+type App struct {
 	searcher Searcher
 }
 
-func New(searcher Searcher) *CLI {
-	return &CLI{
+func New(searcher Searcher) *App {
+	return &App{
 		searcher: searcher,
 	}
 }
 
-func (c *CLI) Search(entity, term, value string) error {
+func (c *App) Search(entity, term, value string) error {
 	printDashes(80)
 	switch strings.ToLower(entity) {
 	case "organizations":
@@ -63,7 +63,7 @@ func (c *CLI) Search(entity, term, value string) error {
 	return nil
 }
 
-func (c *CLI) PrintSearchableFields(organization model.Organization, user model.User, ticket model.Ticket) {
+func (c *App) PrintSearchableFields(organization model.Organization, user model.User, ticket model.Ticket) {
 	printDashes(80)
 	printFields("Users", user.String())
 
