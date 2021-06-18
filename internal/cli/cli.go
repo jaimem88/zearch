@@ -10,9 +10,9 @@ import (
 )
 
 type Searcher interface {
-	Organizations(term, value string) ([]*model.OrganizationResult, error)
-	Tickets(term, value string) []*model.TicketResult
-	Users(term, value string) []*model.UserResult
+	Organizations(term, value string) ([]model.OrganizationResult, error)
+	Tickets(term, value string) []model.TicketResult
+	Users(term, value string) []model.UserResult
 }
 
 type CLI struct {
@@ -65,15 +65,15 @@ func (c *CLI) Search(entity, term, value string) error {
 	return nil
 }
 
-func (c *CLI) PrintSearchableFields() {
+func (c *CLI) PrintSearchableFields(organization model.Organization, user model.User, ticket model.Ticket) {
 	printDashes(80)
-	printFields("Users", model.GetJSONTagsFromStruct(model.User{}))
+	printFields("Users", user.String())
 
 	printDashes(80)
-	printFields("Tickets", model.GetJSONTagsFromStruct(model.Ticket{}))
+	printFields("Tickets", ticket.String())
 
 	printDashes(80)
-	printFields("Organizations", model.GetJSONTagsFromStruct(model.Organization{}))
+	printFields("Organizations", organization.String())
 }
 
 func printFields(param, fields string) {

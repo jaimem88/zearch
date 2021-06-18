@@ -21,13 +21,35 @@ var (
 )
 
 func main() {
-	var users []*model.User
-	var tickets []*model.Ticket
-	var orgs []*model.Organization
+	flag.Parse()
+
+	////var i []map[string]interface{}
+	//var i model.Users
+	//err := parser.ReadJSONFile(*usersFilename, &i)
+	//if err != nil {
+	//	log.Fatalf("failed to load users.json: %+v", err)
+	//}
+	//for key, val := range i {
+	//	fmt.Printf("doc: %d json: %+v id %+v\n", key, val, val["_id"])
+	//	//for k, v := range val {
+	//	//	fmt.Printf("map[%s]%+v\n", k, v)
+	//	//
+	//	//}
+	//}
+	//fmt.Printf("CAN I ACCESS A FIELD: %+v\n", i[0]["_id"])
+	//
+	////fmt.Printf("What happened?: %+v\n\ntypeOf: %q", i, reflect.TypeOf(i.([]interface{})[0]))
+	//return
+	var users model.Users
+	var tickets model.Tickets
+	var orgs model.Organizations
 	err := parser.ReadJSONFile(*usersFilename, &users)
 	if err != nil {
 		log.Fatalf("failed to load users.json: %+v", err)
 	}
+
+	//fmt.Printf("CAN I ACCESS A FIELD: %+v\n", users[0]["_id"])
+	//return
 	err = parser.ReadJSONFile(*ticketsFilename, &tickets)
 	if err != nil {
 		log.Fatalf("failed to load tickets.json: %+v", err)
@@ -37,7 +59,7 @@ func main() {
 		log.Fatalf("failed to load organizations.json: %+v", err)
 	}
 
-	c := cli.New(store.New(users, tickets, orgs))
+	c := cli.New(store.New(orgs, users, tickets))
 	p := promptui.Prompt{
 		Label: "Hi Zendesk! Press return to continue",
 		Templates: &promptui.PromptTemplates{
@@ -96,7 +118,7 @@ func main() {
 			}
 			c.Search(entity, term, value)
 		case 1:
-			c.PrintSearchableFields()
+			c.PrintSearchableFields(orgs[0], users[0], tickets[0])
 		case 2:
 			p := promptui.Prompt{
 				Label:     "Are you sure you want to quit??",
