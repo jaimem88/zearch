@@ -2,7 +2,6 @@ package store
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/jaimem88/zearch/internal/model"
@@ -99,16 +98,4 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 		UsersOrgs:        usersOrgs,
 		TicketsOrgs:      ticketsOrgs,
 	}
-}
-
-// Users ...
-func (s *Storage) Users(term, value string) []model.UserResult {
-	fmt.Printf("searching users for: %q:%q\n", term, value)
-	return []model.UserResult{}
-}
-
-// Tickets ...
-func (s *Storage) Tickets(term, value string) []model.TicketResult {
-	fmt.Printf("searching tickets for: %q:%q\n", term, value)
-	return []model.TicketResult{}
 }

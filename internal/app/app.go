@@ -12,7 +12,7 @@ import (
 
 type Searcher interface {
 	Organizations(term, value string) ([]model.OrganizationResult, error)
-	Tickets(term, value string) []model.TicketResult
+	Tickets(term, value string) ([]model.TicketResult, error)
 	Users(term, value string) []model.UserResult
 }
 

@@ -7,8 +7,8 @@ import (
 
 // These types serve as aliases to help read the code
 type (
-	UserID   int
-	OrgID    int
+	UserID   float64
+	OrgID    float64
 	TicketID string
 )
 
@@ -28,7 +28,7 @@ type TicketResult struct {
 type UserResult struct {
 	User
 	OrganizationName string
-	Tickets          []string
+	TicketsForOrg    []string
 }
 
 type Organization map[string]interface{}
