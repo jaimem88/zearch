@@ -2,7 +2,7 @@ ALL_PACKAGES=$(shell (go list ./... ))
 OUT_DIR := ./out
 BIN := ${OUT_DIR}/bin/zearch
 
-.PHONY: build test race cover clean run
+.PHONY: build test race cover clean run lint
 
 build:
 	rm -rf $(BIN)
@@ -30,3 +30,7 @@ clean:
 
 run: build
 	$(BIN) ${ARGS}
+
+lint:
+	@echo "Running linter in docker container"
+	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint run
