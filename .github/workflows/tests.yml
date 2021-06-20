@@ -8,17 +8,17 @@ jobs:
   tests:
     name: unit tests
     runs-on: ubuntu-latest
+    container: golang:latest
     steps:
       - uses: actions/checkout@v2
       - name: unit tests
-        uses: golang:latest
         run: make test
 
   coverage:
     name: coverage
     runs-on: ubuntu-latest
+    container: golang:latest
     steps:
       - uses: actions/checkout@v2
       - name: coverage
-        uses: golang:latest
         run: make cover
