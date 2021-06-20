@@ -14,11 +14,19 @@ jobs:
       - name: unit tests
         run: make test
 
-  coverage:
-    name: coverage
+  race:
+    name: race
     runs-on: ubuntu-latest
     container: golang:latest
     steps:
       - uses: actions/checkout@v2
-      - name: coverage
+      - name: race
+        run: make race
+  cover:
+    name: test coverage
+    runs-on: ubuntu-latest
+    container: golang:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: cover
         run: make cover
