@@ -38,7 +38,7 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 
 	orgsUsers := map[model.OrgID][]model.UserID{}
 	orgsTickets := map[model.OrgID][]model.TicketID{}
-
+	var m sync.Mutex
 	searchableFields := map[string][]string{}
 
 	wg := sync.WaitGroup{}
@@ -56,7 +56,9 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 			// Get the searchable fields from the first element programmatically. The caveat to this approach is that
 			// if other objects have more fields they won't be printed as searchable.
 			if k == 0 {
+				m.Lock()
 				searchableFields["organizations"] = getOrgFields(org)
+				m.Unlock()
 			}
 		}
 	}()
@@ -75,7 +77,9 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 			}
 
 			if k == 0 {
+				m.Lock()
 				searchableFields["users"] = getUserFields(user)
+				m.Unlock()
 			}
 		}
 	}()
@@ -94,7 +98,9 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 			}
 
 			if k == 0 {
+				m.Lock()
 				searchableFields["tickets"] = getTicketFields(ticket)
+				m.Unlock()
 			}
 		}
 	}()

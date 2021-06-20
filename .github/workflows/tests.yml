@@ -1,0 +1,32 @@
+name: golangci-lint
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  tests:
+    name: unit tests
+    runs-on: ubuntu-latest
+    container: golang:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: unit tests
+        run: make test
+
+  race:
+    name: race
+    runs-on: ubuntu-latest
+    container: golang:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: race
+        run: make race
+  cover:
+    name: test coverage
+    runs-on: ubuntu-latest
+    container: golang:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: cover
+        run: make cover
