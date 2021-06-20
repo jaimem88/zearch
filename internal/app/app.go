@@ -26,6 +26,7 @@ type Storage interface {
 	Organizations(term, value string) ([]model.OrganizationResult, error)
 	Users(term, value string) ([]model.UserResult, error)
 	Tickets(term, value string) ([]model.TicketResult, error)
+	GetSearchableFields() map[string][]string
 }
 
 // App handles the CLI interaction with the user and does the
@@ -74,26 +75,14 @@ func (a *App) Run() error {
 				return fmt.Errorf("search failed: %w", err)
 			}
 		case 1:
-			//a.PrintSearchableFields(orgs[0], users[0], tickets[0])
+			a.printSearchableFields()
 		case 2:
-			confirmQuit := promptui.Prompt{
-				Label:     "Are you sure you want to quit??",
-				IsConfirm: true,
-			}
-
-			quit, err := confirmQuit.Run()
-			if err != nil && !errors.Is(err, promptui.ErrAbort) {
-				// promptui.Prompt returns an empty error when IsConfirm: true https://github.com/manifoldco/promptui/issues/81
-				// we need to check the error type to properly handle the error instead of ignoring it
+			stop, err = a.handleQuit()
+			if err != nil {
 				return err
 			}
-
-			if strings.ToLower(quit) == "y" {
-				fmt.Printf("See ya!")
-				stop = true
-			}
 		default:
-			return fmt.Errorf("unknown option: %d\n", n)
+			return fmt.Errorf("unknown option: %d", n)
 		}
 	}
 
@@ -140,7 +129,9 @@ func (a *App) handleQuit() (bool, error) {
 	}
 
 	quit, err := confirmQuit.Run()
-	if err != nil {
+	if err != nil && !errors.Is(err, promptui.ErrAbort) {
+		// promptui.Prompt returns an empty error when IsConfirm: true https://github.com/manifoldco/promptui/issues/81
+		// we need to check the error type to properly handle the error instead of ignoring it
 		return false, err
 	}
 
@@ -214,25 +205,26 @@ func (a *App) Search(entity, term, value string) error {
 
 		fmt.Printf("Total tickets found: %d\n", len(ticketResults))
 	default:
-		return fmt.Errorf("unkown entity: %s", entity)
+		return fmt.Errorf("unkoown entity: %s", entity)
 	}
 
 	return nil
 }
 
-func (a *App) printSearchableFields(organization model.Organization, user model.User, ticket model.Ticket) {
+func (a *App) printSearchableFields() {
 	printDashes(80)
-	printFields("Organizations", organization.String())
+	fields := a.store.GetSearchableFields()
+	printFields("Organizations", fields["organizations"])
 
 	printDashes(80)
-	printFields("Users", user.String())
+	printFields("Users", fields["users"])
 
 	printDashes(80)
-	printFields("Tickets", ticket.String())
+	printFields("Tickets", fields["tickets"])
 }
 
-func printFields(param, fields string) {
-	fmt.Printf("Search %s by:\n%s", param, fields)
+func printFields(param string, fields []string) {
+	fmt.Printf("Search %s by:\n%s", param, strings.Join(fields, "\n"))
 }
 
 func printDashes(n int) {
