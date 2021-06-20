@@ -148,65 +148,80 @@ func (a *App) Search(entity, term, value string) error {
 
 	switch strings.ToLower(entity) {
 	case "organizations":
-		orgResults, err := a.store.Organizations(term, value)
-		if err != nil {
-			if errors.Is(err, store.ErrNotFound) {
-				fmt.Println("No results found")
-				return nil
-			}
-
-			return err
-		}
-
-		for _, orgResult := range orgResults {
-			err := model.OrgResultTemplate.Execute(os.Stdout, orgResult)
-			if err != nil {
-				return err
-			}
-		}
-
-		fmt.Printf("Total organizations found: %d\n", len(orgResults))
+		return a.searchOrganizations(term, value)
 	case "users":
-		userResults, err := a.store.Users(term, value)
-		if err != nil {
-			if errors.Is(err, store.ErrNotFound) {
-				fmt.Println("No results found")
-				return nil
-			}
-
-			return err
-		}
-
-		for _, userResult := range userResults {
-			err := model.UserResultTemplate.Execute(os.Stdout, userResult)
-			if err != nil {
-				return err
-			}
-		}
-
-		fmt.Printf("Total users found: %d\n", len(userResults))
+		return a.searchUsers(term, value)
 	case "tickets":
-		ticketResults, err := a.store.Tickets(term, value)
-		if err != nil {
-			if errors.Is(err, store.ErrNotFound) {
-				fmt.Println("No results found")
-				return nil
-			}
-
-			return err
-		}
-
-		for _, ticketResult := range ticketResults {
-			err := model.TicketResultTemplate.Execute(os.Stdout, ticketResult)
-			if err != nil {
-				return err
-			}
-		}
-
-		fmt.Printf("Total tickets found: %d\n", len(ticketResults))
+		return a.searchTickets(term, value)
 	default:
 		return fmt.Errorf("unkoown entity: %s", entity)
 	}
+}
+
+func (a *App) searchOrganizations(term, value string) error {
+	orgResults, err := a.store.Organizations(term, value)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		return err
+	}
+
+	for _, orgResult := range orgResults {
+		err := model.OrgResultTemplate.Execute(os.Stdout, orgResult)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Total organizations found: %d\n", len(orgResults))
+
+	return nil
+}
+func (a *App) searchUsers(term, value string) error {
+	userResults, err := a.store.Users(term, value)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		return err
+	}
+
+	for _, userResult := range userResults {
+		err := model.UserResultTemplate.Execute(os.Stdout, userResult)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Total users found: %d\n", len(userResults))
+
+	return nil
+}
+
+func (a *App) searchTickets(term, value string) error {
+	ticketResults, err := a.store.Tickets(term, value)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			fmt.Println("No results found")
+			return nil
+		}
+
+		return err
+	}
+
+	for _, ticketResult := range ticketResults {
+		err := model.TicketResultTemplate.Execute(os.Stdout, ticketResult)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("Total tickets found: %d\n", len(ticketResults))
 
 	return nil
 }

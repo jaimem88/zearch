@@ -11,6 +11,8 @@ output:
 linters-settings:
   gocyclo:
     min-complexity: 15
+  goconst:
+    min-occurrences: 5
   goimports:
     local-prefixes: github.com/jaimem88/zearch
 
