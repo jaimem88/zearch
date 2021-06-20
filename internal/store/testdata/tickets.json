@@ -16,10 +16,33 @@
       "Mississippi",
       "Marshall Islands",
       "South Dakota",
-      "Montana"
+      "Montana",
+      "Massachusetts"
     ],
-    "has_incidents": false,
+    "has_incidents": true,
     "due_at": "2016-08-18T10:49:09 -10:00",
     "via": "web"
+  },
+  {
+    "_id": "c68cb7d7-b517-4d0b-a826-9605423e78c2",
+    "url": "http://initech.zendesk.com/api/v2/tickets/c68cb7d7-b517-4d0b-a826-9605423e78c2.json",
+    "external_id": "4050fefa-f86f-4254-8ee3-dee3e534ab12",
+    "created_at": "2016-03-09T01:39:48 -11:00",
+    "type": "task",
+    "subject": "A Problem in Western Sahara",
+    "description": "Aute pariatur tempor ut consequat duis adipisicing sit in. Veniam ut incididunt mollit sit sit pariatur ad sit sint ad.",
+    "priority": "high",
+    "status": "solved",
+    "submitter_id": 61,
+    "organization_id": 120,
+    "tags": [
+      "Massachusetts",
+      "New York",
+      "Minnesota",
+      "New Jersey"
+    ],
+    "has_incidents": false,
+    "due_at": "2016-08-14T08:16:12 -10:00",
+    "via": "chat"
   }
 ]

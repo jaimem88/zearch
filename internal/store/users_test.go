@@ -10,7 +10,7 @@ import (
 	"github.com/jaimem88/zearch/internal/model"
 )
 
-func TestStorage_Organizations(t *testing.T) {
+func TestStorage_Users(t *testing.T) {
 	orgData := readOrgs(t)
 	userData := readUsers(t)
 	ticketData := readTickets(t)
@@ -22,23 +22,23 @@ func TestStorage_Organizations(t *testing.T) {
 		orgData        model.Organizations
 		term           string
 		value          string
-		expectedResult []*model.OrganizationResult
+		expectedResult []*model.UserResult
 		expectedError  error
 	}{
 		{
-			name:    "search_by_id_with_no_users_no_tickets",
-			orgData: orgData,
-			term:    "_id",
-			value:   "101",
-			expectedResult: []*model.OrganizationResult{
+			name:     "search_by_id_with_no_organizations_no_tickets",
+			userData: userData,
+			term:     "_id",
+			value:    "1",
+			expectedResult: []*model.UserResult{
 				{
-					Organization: orgData[0],
+					User: userData[0],
 				},
 			},
 		},
 		{
 			name:           "search_by_id_does_not_exist",
-			orgData:        orgData,
+			userData:       userData,
 			term:           "_id",
 			value:          "0",
 			expectedResult: nil,
@@ -46,48 +46,50 @@ func TestStorage_Organizations(t *testing.T) {
 		},
 		{
 			name:           "search_by_term_does_not_exist",
-			ticketData:     ticketData,
+			userData:       userData,
 			term:           "unknown",
 			expectedResult: nil,
 			expectedError:  ErrNotFound,
 		},
 		{
-			name:       "search_by_id_with_users_and_tickets",
+			name:       "search_by_id_with_org_and_ticket",
 			orgData:    orgData,
 			userData:   userData,
 			ticketData: ticketData,
 			term:       "_id",
-			value:      "101",
-			expectedResult: []*model.OrganizationResult{
+			value:      "1",
+			expectedResult: []*model.UserResult{
 				{
-					Organization:   orgData[0],
-					UserNames:      []string{"Francis Bailey"},
-					TicketSubjects: []string{"A Problem in Guyana"},
+					User:             userData[0],
+					OrganizationName: "Enthaze",
+					TicketSubjects: []string{
+						"A Problem in Guyana",
+					},
 				},
 			},
 		},
 		{
-			name:    "search_by_shared_tickets_boolean",
-			orgData: orgData,
-			term:    "shared_tickets",
-			value:   "true",
-			expectedResult: []*model.OrganizationResult{
+			name:     "search_by_verified_boolean",
+			userData: userData,
+			term:     "verified",
+			value:    "true",
+			expectedResult: []*model.UserResult{
 				{
-					Organization: orgData[1],
+					User: userData[1],
 				},
 			},
 		},
 		{
-			name:    "search_by_tag_string_slice",
-			orgData: orgData,
-			term:    "tags",
-			value:   "Farley",
-			expectedResult: []*model.OrganizationResult{
+			name:     "search_by_tag_string_slice",
+			userData: userData,
+			term:     "tags",
+			value:    "Leola",
+			expectedResult: []*model.UserResult{
 				{
-					Organization: orgData[0],
+					User: userData[0],
 				},
 				{
-					Organization: orgData[1],
+					User: userData[1],
 				},
 			},
 		},
@@ -96,7 +98,7 @@ func TestStorage_Organizations(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := New(tt.orgData, tt.userData, tt.ticketData)
-			got, err := s.Organizations(tt.term, tt.value)
+			got, err := s.Users(tt.term, tt.value)
 			if tt.expectedError != nil {
 				require.EqualError(t, err, tt.expectedError.Error())
 				return
@@ -105,14 +107,14 @@ func TestStorage_Organizations(t *testing.T) {
 			require.NoError(t, err)
 			assert.Len(t, got, len(tt.expectedResult))
 
-			// sort by orgID to ensure comparison below will be deterministic
+			// sort by user ID to ensure comparison below will be deterministic
 			sort.SliceStable(got, func(i int, j int) bool {
-				return got[i].Organization["_id"].(float64) <= got[j].Organization["_id"].(float64)
+				return got[i].User["_id"].(float64) <= got[j].User["_id"].(float64)
 			})
 
 			for k, expectedResult := range tt.expectedResult {
-				assert.Equal(t, expectedResult.Organization["_id"], got[k].Organization["_id"])
-				assert.ElementsMatch(t, expectedResult.UserNames, got[k].UserNames)
+				assert.Equal(t, expectedResult.User["_id"], got[k].User["_id"])
+				assert.Equal(t, expectedResult.OrganizationName, got[k].OrganizationName)
 				assert.ElementsMatch(t, expectedResult.TicketSubjects, got[k].TicketSubjects)
 			}
 		})

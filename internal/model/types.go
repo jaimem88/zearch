@@ -21,14 +21,13 @@ type OrganizationResult struct {
 
 type TicketResult struct {
 	Ticket
-	OrganizationName  string
-	TicketDescription []string
+	OrganizationName string
 }
 
 type UserResult struct {
 	User
 	OrganizationName string
-	TicketsForOrg    []string
+	TicketSubjects   []string
 }
 
 type Organization map[string]interface{}

@@ -60,6 +60,10 @@ func (s *Storage) searchOrgByTerm(term, value string) ([]model.OrganizationResul
 
 	// search all organizations for a match in a specific field
 	for orgID, org := range s.OrganizationsMap {
+		if org[term] == nil {
+			continue
+		}
+
 		if findOrgMatch(org, term, value) {
 			foundOrgs = append(foundOrgs, &orgAndID{
 				id:  orgID,
@@ -76,6 +80,10 @@ func (s *Storage) searchOrgByTerm(term, value string) ([]model.OrganizationResul
 		}
 
 		result = append(result, orgResult)
+	}
+
+	if len(result) < 1 {
+		return nil, ErrNotFound
 	}
 
 	return result, nil

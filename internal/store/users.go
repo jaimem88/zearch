@@ -8,8 +8,7 @@ import (
 	"github.com/jaimem88/zearch/internal/model"
 )
 
-// Users ...
-// Organizations implements the searcher method for the app. It searches by term and value.
+// Users implements the searcher method for the app. It searches by term and value.
 // Handles a special case for _id which can be looked up in the Storage easily from the
 // UsersMap.
 func (s *Storage) Users(term, value string) ([]model.UserResult, error) {
@@ -38,13 +37,13 @@ func (s *Storage) searchUserByID(value string) ([]model.UserResult, error) {
 	}
 
 	orgID := getUserOrgID(user)
-	orgResult := model.UserResult{
+	userResult := model.UserResult{
 		User:             user,
 		OrganizationName: s.getOrgName(orgID),
-		TicketsForOrg:    s.getTicketsForOrg(orgID),
+		TicketSubjects:   s.getTicketsForOrg(orgID),
 	}
 
-	results = append(results, orgResult)
+	results = append(results, userResult)
 
 	return results, nil
 }
@@ -71,6 +70,10 @@ func (s *Storage) searchUserByTerm(term, value string) ([]model.UserResult, erro
 
 	// search all users for a match in a specific field
 	for userID, user := range s.UsersMap {
+		if user[term] == nil {
+			continue
+		}
+
 		if findUserMatch(user, term, value) {
 			foundUsers = append(foundUsers, &userAndID{
 				id:   userID,
@@ -84,10 +87,14 @@ func (s *Storage) searchUserByTerm(term, value string) ([]model.UserResult, erro
 		userResult := model.UserResult{
 			User:             userAndID.user,
 			OrganizationName: s.getOrgName(orgID),
-			TicketsForOrg:    s.getTicketsForOrg(orgID),
+			TicketSubjects:   s.getTicketsForOrg(orgID),
 		}
 
 		result = append(result, userResult)
+	}
+
+	if len(result) < 1 {
+		return nil, ErrNotFound
 	}
 
 	return result, nil

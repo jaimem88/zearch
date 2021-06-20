@@ -7,8 +7,11 @@ import (
 	"github.com/jaimem88/zearch/internal/model"
 )
 
+// ErrNotFound returned when any search cannot find any match
 var ErrNotFound = errors.New("not found")
 
+// Storage holds an in-memory set of maps that will be used to store and lookup
+// values per key
 type Storage struct {
 	// store the users, tickets and organizations by ID so that accessing them
 	// is done in constant time
@@ -19,10 +22,6 @@ type Storage struct {
 	// Keep a list of users and tickets per orgID
 	OrgsUsers   map[model.OrgID][]model.UserID
 	OrgsTickets map[model.OrgID][]model.TicketID
-
-	// for reverse lookup
-	UsersOrgs   map[model.UserID]model.OrgID
-	TicketsOrgs map[model.TicketID]model.OrgID
 }
 
 // New creates an instance of Storage and preprocess the data to store it in its
@@ -36,9 +35,6 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 
 	orgsUsers := map[model.OrgID][]model.UserID{}
 	orgsTickets := map[model.OrgID][]model.TicketID{}
-
-	usersOrgs := map[model.UserID]model.OrgID{}
-	ticketsOrgs := map[model.TicketID]model.OrgID{}
 
 	wg := sync.WaitGroup{}
 	wg.Add(3)
@@ -65,7 +61,6 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 			if ok {
 				orgID := model.OrgID(orgID)
 				orgsUsers[orgID] = append(orgsUsers[orgID], userID)
-				usersOrgs[userID] = orgID
 			}
 		}
 	}()
@@ -82,7 +77,6 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 			if ok {
 				orgID := model.OrgID(orgID)
 				orgsTickets[orgID] = append(orgsTickets[orgID], ticketID)
-				ticketsOrgs[ticketID] = orgID
 			}
 		}
 	}()
@@ -95,7 +89,5 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 		OrganizationsMap: orgsMap,
 		OrgsUsers:        orgsUsers,
 		OrgsTickets:      orgsTickets,
-		UsersOrgs:        usersOrgs,
-		TicketsOrgs:      ticketsOrgs,
 	}
 }
