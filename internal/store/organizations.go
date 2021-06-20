@@ -10,7 +10,7 @@ import (
 
 // Organizations implements the searcher method for the app. It searches by term and value.
 // Handles a special case for _id which can be looked up in the Storage easily from the
-// OrganizationsMap.
+// organizationsMap.
 func (s *Storage) Organizations(term, value string) ([]model.OrganizationResult, error) {
 	fmt.Printf("Searching organizations by: %q with value: %q\n", term, value)
 
@@ -31,7 +31,7 @@ func (s *Storage) searchOrgByID(value string) ([]model.OrganizationResult, error
 
 	orgID := model.OrgID(id)
 
-	org, ok := s.OrganizationsMap[orgID]
+	org, ok := s.organizationsMap[orgID]
 	if !ok {
 		return nil, ErrNotFound
 	}
@@ -47,7 +47,7 @@ func (s *Storage) searchOrgByID(value string) ([]model.OrganizationResult, error
 	return results, nil
 }
 
-// searchOrgByTerm will iterate over each element of the OrganizationsMap and accessing
+// searchOrgByTerm will iterate over each element of the organizationsMap and accessing
 // the term directly. Once found, the organization and its ID will be saved in a slice to later fetch
 // the related tickets and users.
 func (s *Storage) searchOrgByTerm(term, value string) ([]model.OrganizationResult, error) {
@@ -59,7 +59,7 @@ func (s *Storage) searchOrgByTerm(term, value string) ([]model.OrganizationResul
 	var foundOrgs []*orgAndID
 
 	// search all organizations for a match in a specific field
-	for orgID, org := range s.OrganizationsMap {
+	for orgID, org := range s.organizationsMap {
 		if org[term] == nil {
 			continue
 		}
@@ -119,12 +119,12 @@ func findOrgMatch(org model.Organization, term, value string) bool {
 }
 
 func (s *Storage) getUsersForOrg(orgID model.OrgID) []string {
-	usersForOrg := s.OrgsUsers[orgID]
+	usersForOrg := s.orgsUsers[orgID]
 	// initializing a slice with capacity allows us to use `append` preventing it
 	// from allocating a new slice  when the capacity is reached see https://golang.org/pkg/builtin/#append
 	userNames := make([]string, 0, len(usersForOrg))
 	for _, userID := range usersForOrg {
-		user, ok := s.UsersMap[userID]
+		user, ok := s.usersMap[userID]
 		if !ok {
 			// skip if we can't find the userID for some reason
 			continue
@@ -137,11 +137,11 @@ func (s *Storage) getUsersForOrg(orgID model.OrgID) []string {
 }
 
 func (s *Storage) getTicketsForOrg(orgID model.OrgID) []string {
-	ticketsForOrg := s.OrgsTickets[orgID]
+	ticketsForOrg := s.orgsTickets[orgID]
 	ticketSubjects := make([]string, 0, len(ticketsForOrg))
 	// if we had generics, maybe this could have been implemented once
 	for _, ticketID := range ticketsForOrg {
-		ticket, ok := s.TicketsMap[ticketID]
+		ticket, ok := s.ticketsMap[ticketID]
 		if !ok {
 			// skip if we can't find the ticketID for some reason
 			continue

@@ -15,13 +15,13 @@ var ErrNotFound = errors.New("not found")
 type Storage struct {
 	// store the users, tickets and organizations by ID so that accessing them
 	// is done in constant time
-	UsersMap         map[model.UserID]model.User
-	TicketsMap       map[model.TicketID]model.Ticket
-	OrganizationsMap map[model.OrgID]model.Organization
+	usersMap         map[model.UserID]model.User
+	ticketsMap       map[model.TicketID]model.Ticket
+	organizationsMap map[model.OrgID]model.Organization
 
 	// Keep a list of users and tickets per orgID
-	OrgsUsers   map[model.OrgID][]model.UserID
-	OrgsTickets map[model.OrgID][]model.TicketID
+	orgsUsers   map[model.OrgID][]model.UserID
+	orgsTickets map[model.OrgID][]model.TicketID
 }
 
 // New creates an instance of Storage and preprocess the data to store it in its
@@ -84,10 +84,10 @@ func New(organizations model.Organizations, users model.Users, tickets model.Tic
 	wg.Wait()
 
 	return &Storage{
-		UsersMap:         usersMap,
-		TicketsMap:       ticketsMap,
-		OrganizationsMap: orgsMap,
-		OrgsUsers:        orgsUsers,
-		OrgsTickets:      orgsTickets,
+		usersMap:         usersMap,
+		ticketsMap:       ticketsMap,
+		organizationsMap: orgsMap,
+		orgsUsers:        orgsUsers,
+		orgsTickets:      orgsTickets,
 	}
 }

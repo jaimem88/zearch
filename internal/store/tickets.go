@@ -10,7 +10,7 @@ import (
 
 // Tickets implements the searcher method for the app. It searches by term and value.
 // Handles a special case for _id which can be looked up in the Storage easily from the
-// TicketsMap.
+// ticketsMap.
 func (s *Storage) Tickets(term, value string) ([]model.TicketResult, error) {
 	fmt.Printf("Searching tickets by: %q with value: %q\n", term, value)
 
@@ -24,7 +24,7 @@ func (s *Storage) Tickets(term, value string) ([]model.TicketResult, error) {
 func (s *Storage) searchTicketByID(value string) ([]model.TicketResult, error) {
 	var results []model.TicketResult
 
-	ticket, ok := s.TicketsMap[model.TicketID(value)]
+	ticket, ok := s.ticketsMap[model.TicketID(value)]
 	if !ok {
 		return nil, ErrNotFound
 	}
@@ -56,7 +56,7 @@ func (s *Storage) searchTicketByTerm(term, value string) ([]model.TicketResult, 
 	var foundTicket []model.Ticket
 
 	// search all tickets for a match in a specific field
-	for _, ticket := range s.TicketsMap {
+	for _, ticket := range s.ticketsMap {
 		if ticket[term] == nil {
 			continue
 		}

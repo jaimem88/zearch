@@ -10,7 +10,7 @@ import (
 
 // Users implements the searcher method for the app. It searches by term and value.
 // Handles a special case for _id which can be looked up in the Storage easily from the
-// UsersMap.
+// usersMap.
 func (s *Storage) Users(term, value string) ([]model.UserResult, error) {
 	fmt.Printf("Searching users by: %q with value: %q\n", term, value)
 
@@ -31,7 +31,7 @@ func (s *Storage) searchUserByID(value string) ([]model.UserResult, error) {
 
 	userID := model.UserID(id)
 
-	user, ok := s.UsersMap[userID]
+	user, ok := s.usersMap[userID]
 	if !ok {
 		return nil, ErrNotFound
 	}
@@ -57,7 +57,7 @@ func getUserOrgID(user model.User) model.OrgID {
 	return model.OrgID(orgID)
 }
 
-// searchUserByTerm will iterate over each element of the UsersMap and accessing
+// searchUserByTerm will iterate over each element of the usersMap and accessing
 // the term directly. Once found, the user and its ID will be saved in a slice to later fetch
 // the related tickets and users.
 func (s *Storage) searchUserByTerm(term, value string) ([]model.UserResult, error) {
@@ -69,7 +69,7 @@ func (s *Storage) searchUserByTerm(term, value string) ([]model.UserResult, erro
 	var foundUsers []*userAndID
 
 	// search all users for a match in a specific field
-	for userID, user := range s.UsersMap {
+	for userID, user := range s.usersMap {
 		if user[term] == nil {
 			continue
 		}
@@ -130,7 +130,7 @@ func findUserMatch(user model.User, term, value string) bool {
 }
 
 func (s *Storage) getOrgName(orgID model.OrgID) string {
-	org, ok := s.OrganizationsMap[orgID]
+	org, ok := s.organizationsMap[orgID]
 	if !ok {
 		return ""
 	}
