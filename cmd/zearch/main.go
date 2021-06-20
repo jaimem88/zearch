@@ -4,9 +4,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/jaimem88/zearch/internal/model"
-
 	"github.com/jaimem88/zearch/internal/app"
+	"github.com/jaimem88/zearch/internal/model"
 	"github.com/jaimem88/zearch/internal/store"
 )
 

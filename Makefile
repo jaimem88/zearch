@@ -2,7 +2,7 @@ ALL_PACKAGES=$(shell (go list ./... ))
 OUT_DIR := ./out
 BIN := ${OUT_DIR}/bin/zearch
 
-.PHONY: build test race cover clean run lint
+.PHONY: build test race cover clean run lint help
 
 build:
 	rm -rf $(BIN)
@@ -34,3 +34,11 @@ run: build
 lint:
 	@echo "Running linter in docker container"
 	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint run
+
+docker:
+	docker build -t jaimem88/zearch .
+	docker run -ti --rm jaimem88/zearch
+
+# Obtained from https://stackoverflow.com/questions/4219255/how-do-you-get-the-list-of-targets-in-a-makefile
+help:
+	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
