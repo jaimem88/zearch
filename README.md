@@ -19,7 +19,7 @@ To build and run the application:
 
   ```shell
   make run
-  # or build and run manually an
+  # or build and run manually
   go build -o ./out/bin/zearch ./cmd/zearch/
   ./out/bin/zearch
   ```
@@ -28,7 +28,7 @@ To run unit tests:
 
   ```shell
   make test
-  # or run manually (requires Go 1.16+)
+  # or run them manually
   go test ./...
   ```
 
@@ -80,13 +80,13 @@ Perhaps Python or Ruby would have made my life easier.
 - The lack of generics in Go makes the code look very repetitive. Maybe I could have used higher order functions to try
 to DRY the code somehow.
 - Search by field other than `_id` is done in O(n). In future improvements, I could probably sort the values per field
-and perform a more performant search.
+and do a more performant search (e.g. binary search).
 
 ### Assumptions
 
 Data:
 - JSON files do not contain duplicate IDs for an entity, if they do,
-  only the latest one read will be available to be searched.
+  only the latest one will be available to be searched.
 
 Relationships:
 - An Organization has many users
@@ -104,4 +104,15 @@ Search:
 
 ## Demo
 
-![demo](data/demo.mov)
+![demo](demo.gif)
+
+## About me
+
+If you'd like to learn more about my work, you can see my contributions to GitLab in
+[my profile](https://gitlab.com/jaime). I am a maintainer of
+[GitLab Pages](https://gitlab.com/gitlab-org/gitlab-pages) and 
+GitLab's [release-cli](https://gitlab.com/gitlab-org/gitlab-pages)
+so most of my contributions are done there :)
+
+- [LinkedIn](https://www.linkedin.com/in/jaime-m88/)
+- [Twitter](https://twitter.com/jimbart098)
