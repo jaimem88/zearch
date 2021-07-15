@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/jaimem88/zearch/internal/app"
 	"github.com/jaimem88/zearch/internal/model"
@@ -23,7 +24,7 @@ func main() {
 		log.Fatalf("load data: %+v\n", err)
 	}
 
-	c := app.New(store.New(data.Organizations, data.Users, data.Tickets))
+	c := app.New(store.New(data.Organizations, data.Users, data.Tickets), os.Stdout)
 
 	if err := c.Run(); err != nil {
 		log.Fatalf("run: %+v\n", err)

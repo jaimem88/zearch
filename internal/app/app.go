@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -33,12 +34,14 @@ type Storage interface {
 // information presentation to stdout
 type App struct {
 	store Storage
+	out   io.Writer
 }
 
 // New creates an App with the defined Storage
-func New(store Storage) *App {
+func New(store Storage, out io.Writer) *App {
 	return &App{
 		store: store,
+		out:   out,
 	}
 }
 
@@ -136,15 +139,15 @@ func (a *App) handleQuit() (bool, error) {
 	}
 
 	if strings.ToLower(quit) == "y" {
-		fmt.Printf("See ya!")
+		fmt.Fprintf(a.out, "See ya!")
 		return true, nil
 	}
 
 	return false, nil
 }
 
-func (a *App) Search(entity, term, value string) error {
-	printDashes(80)
+func (a *App) Search(entity, term string, value string) error {
+	a.printDashes(80)
 
 	switch strings.ToLower(entity) {
 	case "organizations":
@@ -159,24 +162,37 @@ func (a *App) Search(entity, term, value string) error {
 }
 
 func (a *App) searchOrganizations(term, value string) error {
-	orgResults, err := a.store.Organizations(term, value)
-	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			fmt.Println("No results found")
-			return nil
+	var orgResults []model.OrganizationResult
+	// TODO: handle `and` properly
+	terms := strings.Split(term, " or ")
+	values := strings.Split(value, " or ")
+
+	if len(terms) != len(values) {
+		return fmt.Errorf("%d terms do not match %d values", len(terms), len(values))
+	}
+
+	for k, term := range terms {
+		orgResultsSubset, err := a.store.Organizations(term, values[k])
+		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				fmt.Fprintf(a.out, "No results found")
+				return nil
+			}
+
+			return err
 		}
 
-		return err
+		orgResults = append(orgResults, orgResultsSubset...)
 	}
 
 	for _, orgResult := range orgResults {
-		err := model.OrgResultTemplate.Execute(os.Stdout, orgResult)
+		err := model.OrgResultTemplate.Execute(a.out, orgResult)
 		if err != nil {
 			return err
 		}
 	}
 
-	fmt.Printf("Total organizations found: %d\n", len(orgResults))
+	fmt.Fprintf(a.out, "Total organizations found: %d\n", len(orgResults))
 
 	return nil
 }
@@ -198,7 +214,7 @@ func (a *App) searchUsers(term, value string) error {
 		}
 	}
 
-	fmt.Printf("Total users found: %d\n", len(userResults))
+	fmt.Fprintf(a.out, "Total users found: %d\n", len(userResults))
 
 	return nil
 }
@@ -221,32 +237,33 @@ func (a *App) searchTickets(term, value string) error {
 		}
 	}
 
-	fmt.Printf("Total tickets found: %d\n", len(ticketResults))
+	fmt.Fprintf(a.out, "Total tickets found: %d\n", len(ticketResults))
 
 	return nil
 }
 
 func (a *App) printSearchableFields() {
-	printDashes(80)
+	a.printDashes(80)
 	fields := a.store.GetSearchableFields()
-	printFields("Organizations", fields["organizations"])
+	a.printFields("Organizations", fields["organizations"])
 
-	printDashes(80)
-	printFields("Users", fields["users"])
+	a.printDashes(80)
+	a.printFields("Users", fields["users"])
 
-	printDashes(80)
-	printFields("Tickets", fields["tickets"])
+	a.printDashes(80)
+	a.printFields("Tickets", fields["tickets"])
 }
 
-func printFields(param string, fields []string) {
-	fmt.Printf("Search %s by:\n%s", param, strings.Join(fields, "\n"))
+func (a *App) printFields(param string, fields []string) {
+	fmt.Fprintf(a.out, "Search %s by:\n%s", param, strings.Join(fields, "\n"))
 }
 
-func printDashes(n int) {
-	fmt.Println()
+func (a *App) printDashes(n int) {
+	fmt.Fprintln(a.out)
 	for n > 0 {
 		n--
-		fmt.Print("-")
+		fmt.Fprint(a.out, "-")
 	}
-	fmt.Println()
+
+	fmt.Fprintln(a.out)
 }

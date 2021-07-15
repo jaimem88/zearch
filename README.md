@@ -116,3 +116,16 @@ so most of my contributions are done there :)
 
 - [LinkedIn](https://www.linkedin.com/in/jaime-m88/)
 - [Twitter](https://twitter.com/jimbart098)
+
+## extension
+
+search by name: james or natalie
+
+
+request 2:
+
+multiple fields
+by name or details
+
+Type search term:: name or details
+value:: natalie or corp
