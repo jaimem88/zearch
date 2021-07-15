@@ -33,7 +33,7 @@ run: build
 
 lint:
 	@echo "Running linter in docker container"
-	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint run
+	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint golangci-lint run
 
 docker:
 	docker build -t jaimem88/zearch .

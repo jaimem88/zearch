@@ -96,14 +96,13 @@ func (ms *mockStore) Organizations(term, value string) ([]model.OrganizationResu
 }
 
 func (ms *mockStore) Users(term, value string) ([]model.UserResult, error) {
-
 	return nil, nil
 }
+
 func (ms *mockStore) Tickets(term, value string) ([]model.TicketResult, error) {
-
 	return nil, nil
 }
-func (ms *mockStore) GetSearchableFields() map[string][]string {
 
+func (ms *mockStore) GetSearchableFields() map[string][]string {
 	return nil
 }
